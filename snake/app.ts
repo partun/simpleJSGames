@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.querySelector('.start');
     startBtn.addEventListener('click', () => {
         if (running) {
-            gameStop('stop button was pressed');
+            gameStop('stop button');
         }
         else {
             gameStart();
@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let running = false;
 
     type vector = [number, number];
+    type stopReason = 'stop button' | 'collision wall' | 'collision tail';
 
     class Snake {
         x: number;
@@ -32,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         interval: number;
 
         constructor() {
-            this.x = 3;
-            this.y = 3;
+            this.x = Math.floor(width / 2);
+            this.y = Math.floor(height / 2);
             this.direction = [1, 0];
             this.maxLength = 3;
             this.initSpeed = 200;
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             //check for boarder collision
             if (newX < 0 || newX >= width || newY < 0 || newY >= height) {
-                gameStop('collision with wall');
+                gameStop('collision wall');
                 return;
             }
 
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             //check collision with own tail
             for (let i = 0; i < this.tail.length; i++) {
                 if (this.tail[i] === newHead) {
-                    gameStop('collision with own tail');
+                    gameStop('collision tail');
                     return;
                 }
 
@@ -108,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         changeDirection = (event: KeyboardEvent) => {
-            let newDir = controls[event.keyCode];
+            let newDir: vector = controls[event.keyCode];
             if (running && newDir != undefined) {
                 //check to make sure you can only make 90 degree turn
                 if (newDir[0] == snake.direction[0] || newDir[1] == snake.direction[1]) {
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //create html structure
     var gameField: Array<Element[]> = [];
     for (let i = 0; i < height; i++) {
-        let row = [];
+        let row: Element[] = [];
 
         for (let j = 0; j < width; j++) {
             let square = document.createElement('div');
@@ -226,11 +227,30 @@ document.addEventListener('DOMContentLoaded', () => {
         apple.reset();
     }
 
-    function gameStop(stopCode) {
+    function gameStop(reason: stopReason) {
         running = false;
         //stop the snake
         snake.stop();
 
-        console.log('game has stopped because ' + stopCode);
+        let consoleOut: string;
+        switch (reason) {
+            case 'stop button':
+                consoleOut = 'Stop button was pressed!';
+                break;
+
+            case 'collision wall':
+                consoleOut = 'Game stopped because you collided with a wall!';
+                break;
+
+            case 'collision tail':
+                consoleOut = 'Game stopped because you collided with your own tail!'
+                break;
+
+            default:
+                consoleOut = 'Game stopped for unknown reason'
+                break;
+        }
+
+        console.log(consoleOut);
     }
 });

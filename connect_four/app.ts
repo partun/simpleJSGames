@@ -6,7 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //size of the grid depends on the html structure
 
     const winningSeq = 4; //player # disc in a sequence wins the game
-    var players = [ //array of players
+
+    type Color = 'blue' | 'red' | 'green' | 'purple';
+    interface Player {
+        key: string;
+        name: string;
+        color: Color;
+    }
+
+    var players: Player[] = [ //array of players
         {
             key: 'player01',
             name: 'Player Green',
@@ -17,14 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
             name: 'Player Purple',
             color: 'purple'
         }];
+
     var currentPlayerID = Math.floor(Math.random() * players.length); //id of starting player choses a random player to start
     displayCurrentPlayer.innerHTML = currentPlayer().name;
-    var fullColons = new Set(); //set of full colons
+    var fullColons = new Set<number>(); //set of full colons
     var finished = false; //indicates if the game has finished
     var squares = [];
 
     //return current player
-    function currentPlayer() {
+    function currentPlayer(): Player {
         return players[currentPlayerID];
     }
     // changes the player to the next player in the players array
@@ -36,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     for (let i = 0; i < colons.length; i++) {
-        colons[i].setAttribute('id', i); //numbers the colons
+        colons[i].setAttribute('id', i.toString()); //numbers the colons
         squares.push(colons[i].querySelectorAll('.col div')); //add the list of all squares in the colon to squares
         colons[i].addEventListener('click', insertDisc);
     }
@@ -82,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function checkVertical(col_id, row_id, height, width) {
+    function checkVertical(col_id: number, row_id: number, height: number, width: number): boolean {
         //vertical four down
         let player = currentPlayer().key;
         let i = row_id + 1
@@ -100,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return seq >= winningSeq;
     }
 
-    function checkHorizontal(col_id, row_id, height, width) {
+    function checkHorizontal(col_id: number, row_id: number, height: number, width: number): boolean {
         //horizontal four
         let player = currentPlayer().key;
         let left = col_id - 1;
@@ -130,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return seq >= winningSeq;
     }
 
-    function checkPositiveDiagonal(col_id, row_id, height, width) {
+    function checkPositiveDiagonal(col_id: number, row_id: number, height: number, width: number): boolean {
         //positive diagonal (/) four
         let player = currentPlayer().key;
         let left = col_id - 1;
@@ -164,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return seq >= winningSeq;
     }
 
-    function checkNegativeDiagonal(col_id, row_id, height, width) {
+    function checkNegativeDiagonal(col_id: number, row_id: number, height: number, width: number): boolean {
         //negative diagonal (\) four
         let player = currentPlayer().key;
         let left = col_id - 1;
@@ -199,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     //checks if the last inserted disc builds a winning sequence
-    function checkForWinner(col_id, row_id) {
+    function checkForWinner(col_id: number, row_id: number) {
         let height = squares[col_id].length - 1; //max row id
         let width = squares.length - 1; //max colon id
 
@@ -214,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     //player won the game
-    function winGame(player) {
+    function winGame(player: Player) {
         console.log(player.name + ' won the game!')
         result.innerHTML = player.name + ' wins!'
         finished = true
