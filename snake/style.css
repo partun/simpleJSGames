@@ -1,0 +1,21 @@
+.grid {
+    width: 400px;
+    height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    border-style: solid;
+}
+
+.grid diadfv { 
+    background-color: green;
+    border-radius: 10px;
+}
+
+.snake {
+    background-color: blue;
+}
+
+.apple {
+    background-color: red;
+    border-radius: 30px;
+}
