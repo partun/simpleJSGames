@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const height = 12; //squares
 
     const squareSize = 60; //px
-    let running = false
+    let running = false;
 
     class Snake {
         constructor() {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             //check collision with own tail
             for (let i = 0; i < this.tail.length; i++) {
                 if (this.tail[i] === newHead) {
-                    gameStop('collision with own tail')
+                    gameStop('collision with own tail');
                     return;
                 }
 
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     //this is a 180 degree tour, which would imminently kill me
                     return;
                 }
-                this.direction = newDir
+                this.direction = newDir;
                 console.log(newDir);
             }
         }
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         set = () => {
             if (this.isSet) {
-                return
+                return;
             }
             this.x = randInt(width);
             this.y = randInt(height);
@@ -149,11 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function field(x, y) {
-        return gameField[y][x]
+        return gameField[y][x];
     }
 
     function toPx(value) {
-        return value.toString() + 'px'
+        return value.toString() + 'px';
     }
 
     function randInt(upper) {
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.style.width = toPx(width * squareSize);
 
     //create html structure
-    var gameField = []
+    var gameField = [];
     for (let i = 0; i < height; i++) {
         let row = [];
 
@@ -193,12 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     }
-    document.addEventListener('keydown', pressSpaceToStart)
+    document.addEventListener('keydown', pressSpaceToStart);
 
     function gameStart() {
         //setup the game
-        running = true
-        document.removeEventListener('keydown', pressSpaceToStart)
+        running = true;
+        document.removeEventListener('keydown', pressSpaceToStart);
 
 
         //create the snake
@@ -214,6 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         //stop the snake
         snake.stop();
 
-        console.log('game has stopped because ' + stopCode)
+        console.log('game has stopped because ' + stopCode);
     }
 });
