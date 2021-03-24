@@ -23,23 +23,8 @@
     width: 60px;
 }
 
-
-.player-red {
-    background-color: red;
+.taken{
     border-radius: 30px;
 }
 
-.player-blue {
-    background-color: blue;
-    border-radius: 30px;
-}
 
-.player-yellow {
-    background-color: yellow;
-    border-radius: 30px;
-}
-
-.player-purple {
-    background-color: purple;
-    border-radius: 30px;
-}
