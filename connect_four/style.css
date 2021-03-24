@@ -6,15 +6,13 @@
     width: 426px;
 }
 
-
-
 .col {
     height: 360px;
     width: 60px;
     border-right: 1px dotted;
 }
 
-.last {
+.col.last {
     border-right: 0px dotted;
 }
 
