@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const width = 12; //squares
-    const height = 12; //squares
+    const width = 15; //squares
+    const height = 15; //squares
 
     const squareSize = 60; //px
     let running = false;
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     //maps keyCode to vectors
-    let controls = new Map();
+    const controls = new Map();
     controls['38'] = [0, -1]; //up
     controls['40'] = [0, 1]; //down
     controls['39'] = [1, 0]; //right
