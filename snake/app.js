@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.interval = setInterval(this.move, this.speed);
         }
 
+        addToScore = () => {
+            scoreDisplay.innerHTML = ++this.score;
+        }
+
         move = () => {
             //calc new positions for head
             let newX = this.x + this.direction[0];
@@ -87,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.tail.push(newHead); //add new head to the tail
             newHead.classList.add('snake') //mark head as part of the snake
-            addToScore();
+            this.addToScore();
         }
 
         changeDirection = (event) => {
@@ -103,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
 
     class Apple {
         constructor() {
@@ -179,13 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gameField.push(row);
     }
 
-
     const apple = new Apple();
     const snake = new Snake();
-
-    function addToScore() {
-        scoreDisplay.innerHTML = ++snake.score;
-    }
 
     function pressSpaceToStart(event) {
         if (!running && event.keyCode == 32) {
