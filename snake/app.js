@@ -25,10 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
             this.tail = [];
             this.maxLength = 3;
             this.initSpeed = 200;
+            this.speed = this.initSpeed;
+            this.acc = 0.95;
+            this.score = 0;
 
             let head = field(this.x, this.y);
             this.tail.push(head);
-            head.classList.add('snake')
+            head.classList.add('snake');
         }
         start = () => {
             this.interval = setInterval(this.move, this.initSpeed);
@@ -36,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stop = () => {
             clearInterval(this.interval);
+        }
+
+        increaseSpeed = () => {
+            this.speed *= this.acc;
+            clearInterval(this.interval);
+            this.interval = setInterval(this.move, this.speed);
         }
 
         move = () => {
@@ -51,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             //check for apple collision
             if (newX == apple.x && newY == apple.y) {
+                this.increaseSpeed();
                 apple.reset();
                 this.maxLength++;
             }
@@ -77,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.tail.push(newHead); //add new head to the tail
             newHead.classList.add('snake') //mark head as part of the snake
+            addToScore();
         }
 
         changeDirection = (event) => {
@@ -169,8 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    let apple = new Apple();
+    const apple = new Apple();
     const snake = new Snake();
+
+    function addToScore() {
+        scoreDisplay.innerHTML = ++snake.score;
+    }
 
     function pressSpaceToStart(event) {
         if (!running && event.keyCode == 32) {
@@ -178,16 +193,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     }
-    document.addEventListener('keyup', pressSpaceToStart)
+    document.addEventListener('keydown', pressSpaceToStart)
 
     function gameStart() {
         //setup the game
         running = true
-        document.removeEventListener('keyup', pressSpaceToStart)
+        document.removeEventListener('keydown', pressSpaceToStart)
 
 
         //create the snake
-        document.addEventListener('keyup', snake.changeDirection);
+        document.addEventListener('keydown', snake.changeDirection);
         snake.start();
 
         //set apple
