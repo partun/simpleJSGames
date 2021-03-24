@@ -1,256 +1,256 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const grid: HTMLDivElement = document.querySelector('.grid');
-    const scoreDisplay = document.querySelector('.score span');
-    const startBtn = document.querySelector('.start');
-    startBtn.addEventListener('click', () => {
-        if (running) {
-            gameStop('stop button');
-        }
-        else {
-            gameStart();
-        }
-    });
+   const grid: HTMLDivElement = document.querySelector('.grid');
+   const scoreDisplay = document.querySelector('.score span');
+   const startBtn = document.querySelector('.start');
+   startBtn.addEventListener('click', () => {
+      if (running) {
+         gameStop('stop button');
+      } else {
+         gameStart();
+      }
+   });
 
-    const width = 15; //squares
-    const height = 15; //squares
+   const width = 15; //squares
+   const height = 15; //squares
 
-    const squareSize = 60; //px
-    let running = false;
+   const squareSize = 60; //px
+   let running = false;
 
-    type vector = [number, number];
-    type stopReason = 'stop button' | 'collision wall' | 'collision tail';
+   type vector = [number, number];
+   type stopReason = 'stop button' | 'collision wall' | 'collision tail';
 
-    class Snake {
-        x: number;
-        y: number;
-        direction: vector;
-        tail: Element[] = [];
-        maxLength: number;
-        initSpeed: number;
-        speed: number;
-        acc: number;
-        score: number;
-        interval: number;
+   class Snake {
+      x: number;
+      y: number;
+      direction: vector;
+      tail: Element[] = [];
+      maxLength: number;
+      initSpeed: number;
+      speed: number;
+      acc: number;
+      score: number;
+      interval: number;
 
-        constructor() {
-            this.x = Math.floor(width / 2);
-            this.y = Math.floor(height / 2);
-            this.direction = [1, 0];
-            this.maxLength = 3;
-            this.initSpeed = 200;
-            this.speed = this.initSpeed;
-            this.acc = 0.95;
-            this.score = 0;
+      constructor() {
+         this.x = Math.floor(width / 2);
+         this.y = Math.floor(height / 2);
+         this.direction = [1, 0];
+         this.maxLength = 3;
+         this.initSpeed = 200;
+         this.speed = this.initSpeed;
+         this.acc = 0.95;
+         this.score = 0;
 
-            let head = field(this.x, this.y);
-            this.tail.push(head);
-            head.classList.add('snake');
-        }
+         let head = field(this.x, this.y);
+         this.tail.push(head);
+         head.classList.add('snake');
+      }
 
-        start = () => {
-            this.interval = setInterval(this.move, this.initSpeed);
-        }
+      start = () => {
+         this.interval = setInterval(this.move, this.initSpeed);
+      };
 
-        stop = () => {
-            clearInterval(this.interval);
-        }
+      stop = () => {
+         clearInterval(this.interval);
+      };
 
-        increaseSpeed = () => {
-            this.speed *= this.acc;
-            clearInterval(this.interval);
-            this.interval = setInterval(this.move, this.speed);
-        }
+      increaseSpeed = () => {
+         this.speed *= this.acc;
+         clearInterval(this.interval);
+         this.interval = setInterval(this.move, this.speed);
+      };
 
-        addToScore = () => {
-            scoreDisplay.innerHTML = (++this.score).toString();
-        }
+      addToScore = () => {
+         scoreDisplay.innerHTML = (++this.score).toString();
+      };
 
-        move = () => {
-            //calc new positions for head
-            let newX = this.x + this.direction[0];
-            let newY = this.y + this.direction[1];
+      move = () => {
+         //calc new positions for head
+         let newX = this.x + this.direction[0];
+         let newY = this.y + this.direction[1];
 
-            //check for boarder collision
-            if (newX < 0 || newX >= width || newY < 0 || newY >= height) {
-                gameStop('collision wall');
-                return;
-            }
-
-            //check for apple collision
-            if (newX == apple.x && newY == apple.y) {
-                this.increaseSpeed();
-                apple.reset();
-                this.maxLength++;
-            }
-
-            //if snake is to long we have to remove the last element
-            if (this.tail.length > this.maxLength - 1) {
-                let oldTail = this.tail.shift()
-                oldTail.classList.remove('snake') //remove mark form old tail of the snake
-            }
-
-            //update position values
-            this.x = newX;
-            this.y = newY;
-            let newHead = field(newX, newY);
-
-            //check collision with own tail
-            for (let i = 0; i < this.tail.length; i++) {
-                if (this.tail[i] === newHead) {
-                    gameStop('collision tail');
-                    return;
-                }
-
-            }
-
-            this.tail.push(newHead); //add new head to the tail
-            newHead.classList.add('snake') //mark head as part of the snake
-            this.addToScore();
-        }
-
-        changeDirection = (event: KeyboardEvent) => {
-            let newDir: vector = controls[event.keyCode];
-            if (running && newDir != undefined) {
-                //check to make sure you can only make 90 degree turn
-                if (newDir[0] == snake.direction[0] || newDir[1] == snake.direction[1]) {
-                    //this is a 180 degree tour, which would imminently kill me
-                    return;
-                }
-                this.direction = newDir;
-                console.log(newDir);
-            }
-        }
-    }
-
-    class Apple {
-        x: number;
-        y: number;
-        isSet: boolean;
-
-        constructor() {
-            this.x = 0;
-            this.y = 0;
-            this.isSet = false;
-        }
-
-        set = () => {
-            if (this.isSet) {
-                return;
-            }
-            this.x = randInt(width);
-            this.y = randInt(height);
-            this.isSet = true;
-            field(this.x, this.y).classList.add('apple');
-        }
-
-        remove = () => {
-            if (!this.isSet) {
-                return;
-            }
-            this.isSet = false;
-            field(this.x, this.y).classList.remove('apple');
-        }
-
-        reset = () => {
-            this.remove();
-            this.set();
-        }
-    }
-
-    //maps keyCode to vectors
-    const controls = new Map<number, vector>();
-    controls[38] = [0, -1]; //up
-    controls[40] = [0, 1]; //down
-    controls[39] = [1, 0]; //right
-    controls[37] = [-1, 0]; //left
-    controls[87] = [0, -1]; //up
-    controls[83] = [0, 1]; //down
-    controls[68] = [1, 0]; //right
-    controls[65] = [-1, 0]; //left
-
-
-    function field(x: number, y: number): Element {
-        return gameField[y][x];
-    }
-
-    function toPx(x: number): string {
-        return x.toString() + 'px';
-    }
-
-    function randInt(upper: number): number {
-        return Math.floor(Math.random() * upper);
-    }
-
-    //set the grid to the correct size
-    grid.style.height = toPx(height * squareSize);
-    grid.style.width = toPx(width * squareSize);
-
-    //create html structure
-    var gameField: Array<Element[]> = [];
-    for (let i = 0; i < height; i++) {
-        let row: Element[] = [];
-
-        for (let j = 0; j < width; j++) {
-            let square = document.createElement('div');
-            square.style.width = toPx(squareSize);
-            square.style.height = toPx(squareSize);
-            grid.appendChild(square);
-            row.push(square);
-        }
-        gameField.push(row);
-    }
-
-    const apple = new Apple();
-    const snake = new Snake();
-
-    function pressSpaceToStart(event: KeyboardEvent): void {
-        console.log(event.keyCode);
-
-        if (!running && event.keyCode == 32) {
-            gameStart();
+         //check for boarder collision
+         if (newX < 0 || newX >= width || newY < 0 || newY >= height) {
+            gameStop('collision wall');
             return;
-        }
-    }
-    document.addEventListener('keydown', pressSpaceToStart);
+         }
 
-    function gameStart() {
-        //setup the game
-        running = true;
-        document.removeEventListener('keydown', pressSpaceToStart);
+         //check for apple collision
+         if (newX == apple.x && newY == apple.y) {
+            this.increaseSpeed();
+            apple.reset();
+            this.maxLength++;
+         }
 
+         //if snake is to long we have to remove the last element
+         if (this.tail.length > this.maxLength - 1) {
+            let oldTail = this.tail.shift();
+            oldTail.classList.remove('snake'); //remove mark form old tail of the snake
+         }
 
-        //create the snake
-        document.addEventListener('keydown', snake.changeDirection);
-        snake.start();
+         //update position values
+         this.x = newX;
+         this.y = newY;
+         let newHead = field(newX, newY);
 
-        //set apple
-        apple.reset();
-    }
+         //check collision with own tail
+         for (let i = 0; i < this.tail.length; i++) {
+            if (this.tail[i] === newHead) {
+               gameStop('collision tail');
+               return;
+            }
+         }
 
-    function gameStop(reason: stopReason) {
-        running = false;
-        //stop the snake
-        snake.stop();
+         this.tail.push(newHead); //add new head to the tail
+         newHead.classList.add('snake'); //mark head as part of the snake
+         this.addToScore();
+      };
 
-        let consoleOut: string;
-        switch (reason) {
-            case 'stop button':
-                consoleOut = 'Stop button was pressed!';
-                break;
+      changeDirection = (event: KeyboardEvent) => {
+         let newDir: vector = controls[event.keyCode];
+         if (running && newDir != undefined) {
+            //check to make sure you can only make 90 degree turn
+            if (
+               newDir[0] == snake.direction[0] ||
+               newDir[1] == snake.direction[1]
+            ) {
+               //this is a 180 degree tour, which would imminently kill me
+               return;
+            }
+            this.direction = newDir;
+            console.log(newDir);
+         }
+      };
+   }
 
-            case 'collision wall':
-                consoleOut = 'Game stopped because you collided with a wall!';
-                break;
+   class Apple {
+      x: number;
+      y: number;
+      isSet: boolean;
 
-            case 'collision tail':
-                consoleOut = 'Game stopped because you collided with your own tail!'
-                break;
+      constructor() {
+         this.x = 0;
+         this.y = 0;
+         this.isSet = false;
+      }
 
-            default:
-                consoleOut = 'Game stopped for unknown reason'
-                break;
-        }
+      set = () => {
+         if (this.isSet) {
+            return;
+         }
+         this.x = randInt(width);
+         this.y = randInt(height);
+         this.isSet = true;
+         field(this.x, this.y).classList.add('apple');
+      };
 
-        console.log(consoleOut);
-    }
+      remove = () => {
+         if (!this.isSet) {
+            return;
+         }
+         this.isSet = false;
+         field(this.x, this.y).classList.remove('apple');
+      };
+
+      reset = () => {
+         this.remove();
+         this.set();
+      };
+   }
+
+   //maps keyCode to vectors
+   const controls = new Map<number, vector>();
+   controls[38] = [0, -1]; //up
+   controls[40] = [0, 1]; //down
+   controls[39] = [1, 0]; //right
+   controls[37] = [-1, 0]; //left
+   controls[87] = [0, -1]; //up
+   controls[83] = [0, 1]; //down
+   controls[68] = [1, 0]; //right
+   controls[65] = [-1, 0]; //left
+
+   function field(x: number, y: number): Element {
+      return gameField[y][x];
+   }
+
+   function toPx(x: number): string {
+      return x.toString() + 'px';
+   }
+
+   function randInt(upper: number): number {
+      return Math.floor(Math.random() * upper);
+   }
+
+   //set the grid to the correct size
+   grid.style.height = toPx(height * squareSize);
+   grid.style.width = toPx(width * squareSize);
+
+   //create html structure
+   var gameField: Array<Element[]> = [];
+   for (let i = 0; i < height; i++) {
+      let row: Element[] = [];
+
+      for (let j = 0; j < width; j++) {
+         let square = document.createElement('div');
+         square.style.width = toPx(squareSize);
+         square.style.height = toPx(squareSize);
+         grid.appendChild(square);
+         row.push(square);
+      }
+      gameField.push(row);
+   }
+
+   const apple = new Apple();
+   const snake = new Snake();
+
+   function pressSpaceToStart(event: KeyboardEvent): void {
+      console.log(event.keyCode);
+
+      if (!running && event.keyCode == 32) {
+         gameStart();
+         return;
+      }
+   }
+   document.addEventListener('keydown', pressSpaceToStart);
+
+   function gameStart() {
+      //setup the game
+      running = true;
+      document.removeEventListener('keydown', pressSpaceToStart);
+
+      //create the snake
+      document.addEventListener('keydown', snake.changeDirection);
+      snake.start();
+
+      //set apple
+      apple.reset();
+   }
+
+   function gameStop(reason: stopReason) {
+      running = false;
+      //stop the snake
+      snake.stop();
+
+      let consoleOut: string;
+      switch (reason) {
+         case 'stop button':
+            consoleOut = 'Stop button was pressed!';
+            break;
+
+         case 'collision wall':
+            consoleOut = 'Game stopped because you collided with a wall!';
+            break;
+
+         case 'collision tail':
+            consoleOut =
+               'Game stopped because you collided with your own tail!';
+            break;
+
+         default:
+            consoleOut = 'Game stopped for unknown reason';
+            break;
+      }
+
+      console.log(consoleOut);
+   }
 });
